@@ -1,5 +1,6 @@
 using CodeFirstApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
@@ -28,6 +29,12 @@ namespace CodeFirstApi.Controllers
 
         public IActionResult Create()//HttpGet ke liye chalega
         {
+            List<SelectListItem> Gender = new List<SelectListItem>()
+            {
+                new SelectListItem{Value= "Male",Text ="Male"},
+                new SelectListItem{Value="Female",Text ="female"},
+            };
+            ViewBag.Gender = Gender;
             return View();
         }
         [HttpPost]
@@ -62,6 +69,13 @@ namespace CodeFirstApi.Controllers
 
         public async Task<IActionResult> Edit(int? id)//HttpGet ke liye chalega
         {
+            List<SelectListItem> Gender = new List<SelectListItem>()
+            {
+                new SelectListItem{Value= "Male",Text ="Male"},
+                new SelectListItem{Value="Female",Text ="female"},
+            };
+            ViewBag.Gender = Gender;
+
             if (id == null || studentDB == null)
             {
                 return NotFound();
