@@ -1,5 +1,8 @@
+using CodeFirstApi.Interfaces;
 using CodeFirstApi.Models;
+using CodeFirstApi.Services;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace CodeFirstApi
 {
@@ -11,7 +14,12 @@ namespace CodeFirstApi
 
             var provider = builder.Services.BuildServiceProvider();
             var config = provider.GetRequiredService<IConfiguration>();
+            //redis-connection
+
+            builder.Services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(builder.Configuration.GetSection("RedisConnection:Connection").Value!.ToString()));
+
             builder.Services.AddDbContext<StudentDBContext>(item => item.UseSqlServer(config.GetConnectionString("dbcs")));
+            builder.Services.AddTransient<IRedisCache, RedisCache>();
 
 
             // Add services to the container.

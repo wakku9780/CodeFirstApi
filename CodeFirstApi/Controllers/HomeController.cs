@@ -1,3 +1,4 @@
+using CodeFirstApi.Interfaces;
 using CodeFirstApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,6 +10,7 @@ namespace CodeFirstApi.Controllers
     public class HomeController : Controller
     {
         private readonly StudentDBContext studentDB;
+        private readonly IRedisCache _redisCache;
 
         //private readonly ILogger<HomeController> _logger;
 
@@ -16,15 +18,23 @@ namespace CodeFirstApi.Controllers
         //{
         //    _logger = logger;
         //}
-        public HomeController(StudentDBContext studentDB)
+        public HomeController(StudentDBContext studentDB,IRedisCache redisCache)
         {
             this.studentDB = studentDB;
+           _redisCache=redisCache;
         }
         public async Task<IActionResult> Index()
         {
-            var stdData = await studentDB.Students.ToListAsync();
+            var result = await _redisCache.GetCacheData<List<Student>>("student");
+            if (result == null)
+            {
+                result = await studentDB.Students.ToListAsync();
+                bool isCached = await _redisCache.SetCacheData("student", result, DateTimeOffset.Now.AddMinutes(2));
+            }
+            return View(result);
+            //var stdData = await studentDB.Students.ToListAsync();
 
-            return View(stdData);
+            //return View(stdData);
         }
 
         public IActionResult Create()//HttpGet ke liye chalega
